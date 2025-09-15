@@ -1,0 +1,558 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: sans-serif;
+    background-color: #002f41; /* デフォルトの背景色 */
+}
+
+#app-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    background-color: transparent;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Input Screen */
+#input-screen .header {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    font-size: 24px;
+    z-index: 11; /* above GGJ banner */
+}
+
+#menu-button {
+    cursor: pointer;
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    /* 3-line hamburger via CSS (adapts to currentColor) */
+    background:
+      linear-gradient(currentColor, currentColor) center/24px 2px no-repeat,
+      linear-gradient(currentColor, currentColor) center/24px 2px no-repeat,
+      linear-gradient(currentColor, currentColor) center/24px 2px no-repeat;
+    background-position: 50% 12px, 50% 21px, 50% 30px;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font-size: 0; /* hide any fallback text */
+}
+
+#menu-button:hover {
+    opacity: 0.85;
+}
+
+/* Dropdown under hamburger */
+.menu-dropdown {
+    position: fixed;
+    top: 56px; /* will be repositioned via JS */
+    left: 16px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    min-width: 160px;
+    z-index: 1000;
+    padding: 4px;
+}
+.menu-dropdown.hidden { display: none; }
+.menu-dropdown .menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: inherit;
+    text-decoration: none;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    font: inherit;
+}
+.menu-dropdown .menu-item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Settings header: howto link */
+#settings-screen .settings-header .howto-link {
+    margin-left: 12px;
+    font-size: 16px;
+    color: inherit;
+    text-decoration: underline;
+    opacity: 0.9;
+}
+
+#input-display {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Prevent oversized text on wide screens */
+    font-size: clamp(48px, 15vw, 120px);
+    padding: 20px;
+    box-sizing: border-box;
+    min-height: 100px;
+}
+
+#keypad {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.keypad-row {
+    display: flex;
+    flex: 1;
+}
+
+.key {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Scale with viewport but cap for desktop */
+    font-size: clamp(18px, 8vw, 40px);
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+    padding: 12px 0;
+}
+
+.key:active {
+    background-color: #ddd;
+}
+
+#input-screen {
+    position: relative; /* for canvas overlay */
+    /* move bg image to ::before so we can offset under GGJ image */
+    background: none;
+    padding: 0 0px;
+    z-index: 0; /* establish stacking context so ::before can sit behind */
+}
+
+/* Background teita.png positioned 20px below GGJ2025.png dynamically */
+#input-screen::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--teita-offset, 0px);
+    bottom: 0;
+    background-image: url('img/teita.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: 100% auto;
+    z-index: -1; /* behind input and other content */
+    pointer-events: none;
+}
+
+#ggj-link {
+    display: block;
+    position: absolute;
+    top: 50px; /* 画面上部から適切な位置に配置 */
+    z-index: 10;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.7); /* 半透明の白 */
+    border-radius: 15px; /* 角丸 */
+    padding: 10px; /* 画像より少し大きくなるように調整 */
+    text-align: center;
+    line-height: 0; /* リンク内の余分なスペースを削除 */
+}
+
+#ggj-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px; /* 画像自体の角丸 */
+}
+
+/* Two/three-digit modes now use dynamic background color via JS */
+#input-screen.two-digit-mode {
+    /* Visual feedback when 10-mode is active */
+    background-color: rgba(0, 0, 0, 0.28);
+}
+#input-screen.hundred-digit-mode {}
+
+/* Handwriting canvas overlay */
+#handwrite-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 5;
+    touch-action: none; /* allow smooth pointer drawing */
+}
+
+/* Ensure drawn image fits in display */
+#number-display img {
+    max-width: 90vw;
+    max-height: 80vh;
+    display: block;
+}
+
+
+/* Display Screen */
+#display-screen {
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#number-display {
+    font-size: 40vw;
+    font-weight: bold;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Add underline to numbers to indicate orientation */
+#number-display,
+#input-display,
+#preview-numbers span {
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.01em;
+    text-underline-offset: 0.1em;
+}
+
+#close-display-button {
+    position: absolute;
+    bottom: 30px;
+    font-size: 30px;
+    cursor: pointer;
+    border: 2px solid #333;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#number-display.animate {
+    transform: scale(1.1);
+}
+
+/* Settings Screen */
+#settings-screen {
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.2); /* 透明度を追加 */
+    color: #ffffff; /* 文字色を白に設定 */
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#close-settings, #close-record {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.setting {
+    margin-bottom: 20px;
+}
+
+.setting label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.setting.gesture-setting {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 要素間のスペース */
+    flex-wrap: wrap; /* 必要に応じて折り返し */
+}
+
+.setting.gesture-setting input[type="checkbox"] {
+    margin-right: 0; /* デフォルトのマージンをリセット */
+}
+
+.setting.gesture-setting label {
+    margin-bottom: 0; /* デフォルトのマージンをリセット */
+    white-space: nowrap; /* ラベルの折り返しを防ぐ */
+    flex-grow: 1; /* 利用可能なスペースを埋めるように拡張 */
+}
+
+.setting.gesture-setting .gesture-result-select {
+    flex-shrink: 0; /* 縮小しない */
+    min-width: 30px; /* 最小幅を設定 */
+}
+
+.setting input[type="range"] {
+    width: 100%;
+}
+
+.setting label {
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.color-settings-group {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.color-setting {
+    display: flex;
+    align-items: center;
+}
+
+.rotation-options {
+    display: flex;
+    flex-wrap: wrap; /* 折り返しを許可 */
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.rotation-options input[type="radio"] {
+    margin-right: 5px;
+}
+
+#log-container {
+    margin-top: 30px;
+}
+
+#log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#log-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+#preview-numbers {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 50px; /* 数字間のスペース */
+    opacity: 0.1; /* 薄く表示 */
+    pointer-events: none; /* クリックイベントを無効化 */
+    z-index: 0; /* 背景の上、UIの下に配置 */
+}
+
+#preview-numbers span {
+    font-size: 40vw; /* デフォルトのフォントサイズ */
+    font-weight: bold;
+}
+
+/* --- Added: Buttons and Record Screen Styles --- */
+.icon-button {
+    border: 2px solid #333;
+    background: rgba(255,255,255,0.1);
+    color: inherit;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+}
+.top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+#record-screen {
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+}
+.record-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+.record-actions #copy-tsv {
+    white-space: nowrap;         /* 折り返し禁止 */
+    writing-mode: horizontal-tb; /* 横書き固定 */
+}
+.record-actions .note {
+    opacity: 0.8;
+    font-size: 14px;
+}
+.record-table-wrapper {
+    overflow: auto;
+    max-height: calc(100% - 120px);
+}
+#record-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(0,0,0,0.2);
+}
+#record-table th, #record-table td {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px;
+    text-align: left;
+}
+#record-table select, #record-table input[type="text"] {
+    font-size: 14px;
+}
+/* Close buttons (circle X SVG) */
+.close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+.close-btn .icon { width: 28px; height: 28px; }
+
+/* Record: photo preview + controls */
+.photo-thumb {
+  width: 56px;
+  height: 42px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  background: rgba(0,0,0,0.2);
+}
+.photo-btn {
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.05);
+  color: inherit;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 8px;
+}
+.photo-btn .icon { width: 20px; height: 20px; }
+
+/* Image Viewer Overlay */
+.image-viewer {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.image-viewer.hidden { display: none; }
+.image-viewer-inner { position: relative; max-width: 90vw; max-height: 90vh; }
+.image-viewer-inner img { max-width: 90vw; max-height: 80vh; border-radius: 6px; }
+.image-viewer-inner .close-btn { position: absolute; top: -10px; right: -10px; }
+/* Header image above number input */
+#input-header-image {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+#input-header-image .header-image {
+  max-width: 100%;
+  max-height: 20vh;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (min-width: 768px) {
+    #ggj-link {
+        max-width: 600px; /* PC表示時の最大幅を設定 */
+        z-index: 10;
+    }
+}
+
+/* Gesture settings: grid layout with header alignment */
+.setting.gesture-setting {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) minmax(40px, 120px) minmax(40px, 120px);
+  align-items: center;
+  gap: 8px 12px;
+}
+.setting.gesture-setting input[type="checkbox"] {
+  margin-right: 0;
+  justify-self: center;
+}
+.setting.gesture-setting label {
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.setting.gesture-setting .gesture-result-select,
+.setting.gesture-setting .gesture-unit-select {
+  width: 100%;
+  min-width: 0;
+}
+.setting.gesture-setting.gesture-heading {
+  font-weight: 600;
+  opacity: 0.9;
+}
+.setting.gesture-setting.gesture-heading span:first-child {
+  /* placeholder for checkbox column */
+}
+
+/* Mobile: keep one-line rows and align header/rows; allow selects to shrink to 40px */
+@media (max-width: 600px) {
+  .setting.gesture-setting {
+    grid-template-columns: 24px minmax(0, 1fr) minmax(30px, 60px) minmax(30px, 60px);
+    gap: 6px 8px;
+  }
+
+  .setting.gesture-setting .gesture-result-select,
+  .setting.gesture-setting .gesture-unit-select {
+    min-width: 40px;
+    max-width: 100%;
+  }
+
+  /* Header labels don't wrap */
+  .setting.gesture-setting.gesture-heading span {
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>teita</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4X12GTTVRE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);} 
+      gtag('js', new Date());
+      gtag('config', 'G-4X12GTTVRE');
+    </script>
+</head>
+
+<body>
+    <div id="app-container">
+        <div id="input-screen" class="screen active">
+            <a href="https://ggj-2025.studio.site/" target="_blank" id="ggj-link">
+                <img src="img/GGJ2025.png" alt="Global Game Jam 2025 Kyoto" id="ggj-image">
+            </a>
+            <div class="header">
+                <div id="menu-button">三</div>
+            </div>
+            <button id="record-button" class="icon-button top-right">￥</button>
+            <div id="input-display"></div>
+            <div id="keypad">
+                <div class="keypad-row">
+                    <div class="key" data-key="7">7</div>
+                    <div class="key" data-key="8">8</div>
+                    <div class="key" data-key="9">9</div>
+                </div>
+                <div class="keypad-row">
+                    <div class="key" data-key="4">4</div>
+                    <div class="key" data-key="5">5</div>
+                    <div class="key" data-key="6">6</div>
+                </div>
+                <div class="keypad-row">
+                    <div class="key" data-key="1">1</div>
+                    <div class="key" data-key="2">2</div>
+                    <div class="key" data-key="3">3</div>
+                </div>
+                <div class="keypad-row">
+                    <div class="key" data-key="clear">C</div>
+                    <div class="key" data-key="0">0</div>
+                    <div class="key" data-key="10">10</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="display-screen" class="screen">
+            <div id="number-display"></div>
+            <div id="close-display-button">✕</div>
+        </div>
+
+        <div id="settings-screen" class="screen">
+            <div class="settings-header">
+                <h2>設定</h2>
+                <div id="close-settings">✕</div>
+            </div>
+            <div class="settings-content" style="flex-grow: 1; overflow-y: auto; padding-right: 10px;">
+                <h3>①数字の表示</h3>
+                <div class="setting">
+                    <span id="font-size-value">数字の大きさ: 70</span>
+                    <input type="range" id="font-size" min="50" max="150" value="70">
+                </div>
+                <div class="setting">
+                    <span id="animation-emphasis-value">アピールの強さ: 2</span>
+                    <input type="range" id="animation-emphasis" min="1" max="5" value="2">
+                </div>
+                <div class="color-settings-group">
+                    <div class="setting color-setting">
+                        <label for="bg-color">背景色</label>
+                        <input type="color" id="bg-color" value="#1e3333">
+                    </div>
+                    <div class="setting color-setting">
+                        <label for="font-color">文字色</label>
+                        <input type="color" id="font-color" value="#aaaaaa">
+                    </div>
+                </div>
+                <div class="setting">
+                    <label>表示の角度</label>
+                    <div class="rotation-options">
+                        <input type="radio" id="rotate-0" name="rotation" value="0" checked>
+                        <label for="rotate-0">0度</label>
+                        <input type="radio" id="rotate-90" name="rotation" value="90">
+                        <label for="rotate-90">90度</label>
+                        <input type="radio" id="rotate-180" name="rotation" value="180">
+                        <label for="rotate-180">180度</label>
+                        <input type="radio" id="rotate-270" name="rotation" value="270">
+                        <label for="rotate-270">270度</label>
+                    </div>
+                </div>
+                <br>
+                <h3>②数字を消す</h3>
+                <div class="setting">
+                    <span id="shake-sensitivity-value">振って数字を消す感度: 20</span>
+                    <input type="range" id="shake-sensitivity" min="5" max="80" value="20">
+                </div>
+                <div class="setting">
+                    <button id="enable-shake">シェイクを有効化 (iPhone)</button>
+                    <span style="margin-left:8px; opacity:0.8; font-size: 0.9em;">iOSでは許可が必要です</span>
+                </div>
+                <span>※下記はチェックを入れると有効</span>
+                <div class="setting-group">
+                    <div class="setting gesture-setting gesture-heading">
+                        <span aria-hidden="true"></span>
+                        <span>操作</span>
+                        <span>結果</span>
+                        <span>単位</span>
+                    </div>
+                    <div class="setting gesture-setting">
+                        <input type="checkbox" id="enable-swipe-right-to-left">
+                        <label for="enable-swipe-right-to-left">←にスワイプ</label>
+                        <select id="result-swipe-right-to-left" class="gesture-result-select">
+                            <option value="">-</option>
+                            <option value="成">成</option>
+                            <option value="貸">貸</option>
+                            <option value="借">借</option>
+                            <option value="不">不</option>
+                        </select>
+                        <select id="unit-swipe-right-to-left" class="gesture-unit-select">
+                            <option value="">-</option>
+                            <option value="kg">Kg</option>
+                            <option value="case">ケース</option>
+                            <option value="hiki">匹</option>
+                            <option value="hon">本</option>
+                            <option value="ko">個</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    <div class="setting gesture-setting">
+                        <input type="checkbox" id="enable-swipe-left-to-right">
+                        <label for="enable-swipe-left-to-right">→にスワイプ</label>
+                        <select id="result-swipe-left-to-right" class="gesture-result-select">
+                            <option value="">-</option>
+                            <option value="成">成</option>
+                            <option value="貸">貸</option>
+                            <option value="借">借</option>
+                            <option value="不">不</option>
+                        </select>
+                        <select id="unit-swipe-left-to-right" class="gesture-unit-select">
+                            <option value="">-</option>
+                            <option value="kg">Kg</option>
+                            <option value="case">ケース</option>
+                            <option value="hiki">匹</option>
+                            <option value="hon">本</option>
+                            <option value="ko">個</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    <div class="setting gesture-setting">
+                        <input type="checkbox" id="enable-swipe-top-to-bottom">
+                        <label for="enable-swipe-top-to-bottom">↓にスワイプ</label>
+                        <select id="result-swipe-top-to-bottom" class="gesture-result-select">
+                            <option value="">-</option>
+                            <option value="成">成</option>
+                            <option value="貸">貸</option>
+                            <option value="借">借</option>
+                            <option value="不">不</option>
+                        </select>
+                        <select id="unit-swipe-top-to-bottom" class="gesture-unit-select">
+                            <option value="">-</option>
+                            <option value="kg">Kg</option>
+                            <option value="case">ケース</option>
+                            <option value="hiki">匹</option>
+                            <option value="hon">本</option>
+                            <option value="ko">個</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    <div class="setting gesture-setting">
+                        <input type="checkbox" id="enable-swipe-bottom-to-top">
+                        <label for="enable-swipe-bottom-to-top">↑にスワイプ</label>
+                        <select id="result-swipe-bottom-to-top" class="gesture-result-select">
+                            <option value="">-</option>
+                            <option value="成">成</option>
+                            <option value="貸">貸</option>
+                            <option value="借">借</option>
+                            <option value="不">不</option>
+                        </select>
+                        <select id="unit-swipe-bottom-to-top" class="gesture-unit-select">
+                            <option value="">-</option>
+                            <option value="kg">Kg</option>
+                            <option value="case">ケース</option>
+                            <option value="hiki">匹</option>
+                            <option value="hon">本</option>
+                            <option value="ko">個</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    <div class="setting gesture-setting">
+                        <input type="checkbox" id="enable-two-finger-touch">
+                        <label for="enable-two-finger-touch">2本指でタップ</label>
+                        <select id="result-two-finger-touch" class="gesture-result-select">
+                            <option value="">-</option>
+                            <option value="成">成</option>
+                            <option value="貸">貸</option>
+                            <option value="借">借</option>
+                            <option value="不">不</option>
+                        </select>
+                        <select id="unit-two-finger-touch" class="gesture-unit-select">
+                            <option value="">-</option>
+                            <option value="kg">Kg</option>
+                            <option value="case">ケース</option>
+                            <option value="hiki">匹</option>
+                            <option value="hon">本</option>
+                            <option value="ko">個</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <div class="setting">
+                    <button id="reset-defaults">デフォルトに戻す</button>
+                </div>
+            </div>
+            <div id="preview-numbers">
+                <span id="preview-number-27">27</span>
+            </div>
+        </div>
+
+        <div id="record-screen" class="screen">
+            <div class="settings-header">
+                <h2>記録</h2>
+                <div id="close-record">✕</div>
+            </div>
+            <div class="record-actions">
+                <button id="copy-tsv">コピー</button>
+                <span class="note">注意: ブラウザの履歴やサイトデータを削除すると記録は消えます。</span>
+            </div>
+            <div class="record-table-wrapper">
+                <table id="record-table">
+                    <thead>
+                        <tr>
+                            <th>年</th>
+                            <th>月日</th>
+                            <th>曜日</th>
+                            <th>時間</th>
+                            <th>数字</th>
+                            <th>単位</th>
+                            <th>結果</th>
+                            <th>メモ</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
