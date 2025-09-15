@@ -6,7 +6,6 @@ window.addEventListener('load', function() {
     const displayScreen = document.getElementById('display-screen');
     const settingsScreen = document.getElementById('settings-screen');
     const recordScreen = document.getElementById('record-screen');
-
     // Buttons
     const menuButton = document.getElementById('menu-button');
     let menuDropdown; // created dynamically
