@@ -1132,3 +1132,52 @@ window.addEventListener('load', function() {
         }
     }
 });
+
+// 結果と単位のオプションデータ
+const resultOptions = [
+    { value: "", text: "-" },
+    { value: "成", text: "成" },
+    { value: "貸", text: "貸" },
+    { value: "借", text: "借" },
+    { value: "不", text: "不" }
+];
+
+const unitOptions = [
+    { value: "", text: "-" },
+    { value: "kg", text: "Kg" },
+    { value: "case", text: "ケース" },
+    { value: "hiki", text: "匹" },
+    { value: "hon", text: "本" },
+    { value: "ko", text: "個" },
+    { value: "other", text: "その他" }
+];
+
+// select要素にオプションを動的に追加する関数
+function populateSelectOptions() {
+    const resultSelects = document.querySelectorAll('.gesture-result-select');
+    const unitSelects = document.querySelectorAll('.gesture-unit-select');
+
+    resultSelects.forEach(select => {
+        resultOptions.forEach(optionData => {
+            const option = document.createElement('option');
+            option.value = optionData.value;
+            option.textContent = optionData.text;
+            select.appendChild(option);
+        });
+    });
+
+    unitSelects.forEach(select => {
+        unitOptions.forEach(optionData => {
+            const option = document.createElement('option');
+            option.value = optionData.value;
+            option.textContent = optionData.text;
+            select.appendChild(option);
+        });
+    });
+}
+
+// DOMContentLoadedイベントでpopulateSelectOptionsを呼び出す
+document.addEventListener('DOMContentLoaded', () => {
+    populateSelectOptions();
+    // 他のDOMContentLoaded内の処理があればここに追加
+});
